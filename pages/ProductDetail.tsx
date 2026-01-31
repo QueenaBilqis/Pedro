@@ -9,11 +9,17 @@ const ProductDetail: React.FC = () => {
   const product = PRODUCTS.find(p => p.id === id) || PRODUCTS[0];
   const [activeImage, setActiveImage] = useState(product.image);
   
+  // Selection State
+  const [selectedSize, setSelectedSize] = useState('Standard');
+  const [selectedColor, setSelectedColor] = useState('Default');
+
   const inWishlist = isInWishlist(product.id);
 
   // Update active image when product changes
   useEffect(() => {
     setActiveImage(product.image);
+    setSelectedSize('Standard');
+    setSelectedColor('Default');
   }, [product]);
 
   const toggleWishlist = () => {
@@ -23,6 +29,8 @@ const ProductDetail: React.FC = () => {
           addToWishlist(product);
       }
   };
+
+  const currentPrice = selectedSize === 'Large' ? product.price * 1.2 : product.price;
 
   const images = [product.image, ...(product.images || [])].slice(0, 4);
 
@@ -70,7 +78,10 @@ const ProductDetail: React.FC = () => {
               <div className="mb-8">
                 <div className="flex justify-between items-start mb-2">
                   <h2 className="text-4xl lg:text-5xl font-display font-bold tracking-tight">{product.name}</h2>
-                  <p className="text-2xl font-light text-primary">${product.price.toFixed(2)}</p>
+                  <div className="text-right">
+                    <p className="text-2xl font-light text-primary animate-pulse">${currentPrice.toFixed(2)}</p>
+                    {selectedSize === 'Large' && <p className="text-xs text-slate-400">+20% for Large</p>}
+                  </div>
                 </div>
                 <p className="text-slate-500 dark:text-slate-400 leading-relaxed max-w-md">
                   {product.description}
@@ -81,15 +92,16 @@ const ProductDetail: React.FC = () => {
                 <div>
                   <h3 className="text-xs font-bold uppercase tracking-widest mb-4">Select Finish</h3>
                   <div className="flex gap-4">
-                    <button className="w-10 h-10 rounded-full border-2 border-primary p-0.5 transition-transform hover:scale-110">
-                      <div className="w-full h-full rounded-full bg-primary shadow-inner"></div>
-                    </button>
-                    <button className="w-10 h-10 rounded-full border border-slate-200 dark:border-slate-800 p-0.5 transition-transform hover:scale-110">
-                      <div className="w-full h-full rounded-full bg-[#E5E4E2] shadow-inner"></div>
-                    </button>
-                    <button className="w-10 h-10 rounded-full border border-slate-200 dark:border-slate-800 p-0.5 transition-transform hover:scale-110">
-                      <div className="w-full h-full rounded-full bg-[#1A1A1A] shadow-inner"></div>
-                    </button>
+                    {['Default', 'Matte', 'Chrome'].map((color) => (
+                        <button 
+                            key={color}
+                            onClick={() => setSelectedColor(color)}
+                            className={`w-10 h-10 rounded-full border-2 p-0.5 transition-transform hover:scale-110 ${selectedColor === color ? 'border-primary ring-2 ring-primary/20' : 'border-slate-200 dark:border-slate-800'}`}
+                            title={color}
+                        >
+                            <div className={`w-full h-full rounded-full shadow-inner ${color === 'Default' ? 'bg-primary' : color === 'Matte' ? 'bg-[#1A1A1A]' : 'bg-[#E5E4E2]'}`}></div>
+                        </button>
+                    ))}
                   </div>
                 </div>
 
@@ -99,8 +111,18 @@ const ProductDetail: React.FC = () => {
                     <button className="text-[10px] uppercase underline tracking-widest opacity-60 hover:opacity-100 transition-opacity">Size Guide</button>
                   </div>
                   <div className="flex gap-3">
-                    <button className="px-6 py-2 rounded-full border border-primary bg-primary/10 text-primary text-sm font-bold transition-all">Standard</button>
-                    <button className="px-6 py-2 rounded-full border border-slate-200 dark:border-slate-800 text-sm font-bold hover:border-primary transition-all">Large</button>
+                    <button 
+                        onClick={() => setSelectedSize('Standard')}
+                        className={`px-6 py-2 rounded-full border text-sm font-bold transition-all ${selectedSize === 'Standard' ? 'border-primary bg-primary/10 text-primary' : 'border-slate-200 dark:border-slate-800 hover:border-primary'}`}
+                    >
+                        Standard
+                    </button>
+                    <button 
+                        onClick={() => setSelectedSize('Large')}
+                        className={`px-6 py-2 rounded-full border text-sm font-bold transition-all ${selectedSize === 'Large' ? 'border-primary bg-primary/10 text-primary' : 'border-slate-200 dark:border-slate-800 hover:border-primary'}`}
+                    >
+                        Large
+                    </button>
                   </div>
                 </div>
               </div>
@@ -108,7 +130,7 @@ const ProductDetail: React.FC = () => {
               <div className="space-y-4 mb-10">
                 <div className="flex gap-4">
                     <button 
-                    onClick={() => addToCart(product)}
+                    onClick={() => addToCart(product, selectedSize, selectedColor)}
                     className="flex-1 py-5 rounded-full bg-primary text-white font-bold tracking-[0.2em] uppercase hover:shadow-xl hover:shadow-primary/20 transition-all active:scale-[0.98]"
                     >
                         Add to Cart
@@ -134,12 +156,6 @@ const ProductDetail: React.FC = () => {
                     <p>• Lining: Recycled Poly-silk</p>
                     <p>• Hardware: Chrome-plated Zinc Alloy</p>
                   </div>
-                </div>
-                <div className="py-5 border-b border-slate-100 dark:border-slate-800 group cursor-pointer">
-                    <div className="flex justify-between items-center">
-                        <span className="text-sm font-bold uppercase tracking-widest">Shipping & Returns</span>
-                        <span className="material-icons group-hover:text-primary transition-colors">add</span>
-                    </div>
                 </div>
               </div>
             </div>

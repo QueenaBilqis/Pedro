@@ -4,10 +4,30 @@ import { MOCK_ORDERS } from '../constants';
 import { Link, useNavigate } from 'react-router-dom';
 
 const Profile: React.FC = () => {
-  const { user, wishlist, addToCart, removeFromWishlist, logout } = useShop();
+  const { user, wishlist, addToCart, removeFromWishlist, logout, updateUserProfile } = useShop();
   const [activeTab, setActiveTab] = useState('overview');
   const [trackingOrderId, setTrackingOrderId] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
   const navigate = useNavigate();
+
+  // Edit Form State
+  const [formData, setFormData] = useState({
+      name: '',
+      email: '',
+  });
+
+  const handleEditClick = () => {
+      if (user) {
+          setFormData({ name: user.name, email: user.email });
+          setIsEditing(true);
+      }
+  };
+
+  const handleSaveProfile = (e: React.FormEvent) => {
+      e.preventDefault();
+      updateUserProfile(formData);
+      setIsEditing(false);
+  };
 
   const handleLogout = () => {
       logout();
@@ -80,6 +100,41 @@ const Profile: React.FC = () => {
 
   return (
     <div className="flex flex-1 justify-center px-4 md:px-10 lg:px-20 py-10 gap-8 max-w-[1600px] mx-auto w-full relative">
+      
+      {/* Edit Profile Modal */}
+      {isEditing && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+              <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsEditing(false)}></div>
+              <div className="bg-white dark:bg-surface-dark w-full max-w-md rounded-3xl p-8 shadow-2xl relative animate-float border border-slate-100 dark:border-slate-800">
+                   <h3 className="text-2xl font-display font-bold mb-6">Edit Profile</h3>
+                   <form onSubmit={handleSaveProfile} className="space-y-4">
+                       <div>
+                           <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Full Name</label>
+                           <input 
+                                type="text" 
+                                value={formData.name}
+                                onChange={e => setFormData({...formData, name: e.target.value})}
+                                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary"
+                           />
+                       </div>
+                       <div>
+                           <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Email</label>
+                           <input 
+                                type="email" 
+                                value={formData.email}
+                                onChange={e => setFormData({...formData, email: e.target.value})}
+                                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary"
+                           />
+                       </div>
+                       <div className="flex gap-4 pt-4">
+                           <button type="button" onClick={() => setIsEditing(false)} className="px-6 py-3 rounded-xl font-bold hover:bg-slate-100 dark:hover:bg-slate-800">Cancel</button>
+                           <button type="submit" className="flex-1 bg-primary text-white rounded-xl font-bold py-3 shadow-lg shadow-primary/20">Save Changes</button>
+                       </div>
+                   </form>
+              </div>
+          </div>
+      )}
+
       {/* Tracking Modal */}
       {trackingOrderId && (
           <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
@@ -189,7 +244,10 @@ const Profile: React.FC = () => {
             </p>
           </div>
           {activeTab === 'overview' && (
-            <button className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-800 border border-primary/20 rounded-xl shadow-sm hover:shadow-md transition-all text-sm font-bold">
+            <button 
+                onClick={handleEditClick}
+                className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-800 border border-primary/20 rounded-xl shadow-sm hover:shadow-md transition-all text-sm font-bold"
+            >
                 <span className="material-icons-outlined text-primary">edit</span>
                 Edit Profile
             </button>

@@ -8,6 +8,7 @@ import ProductDetail from './pages/ProductDetail';
 import Checkout from './pages/Checkout';
 import Profile from './pages/Profile';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import { ShopProvider } from './context/ShopContext';
 
 // Scroll to top on route change
@@ -34,6 +35,7 @@ const App: React.FC = () => {
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
             </Routes>
           </div>
           <Footer />
