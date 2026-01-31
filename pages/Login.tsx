@@ -150,7 +150,7 @@ const Login: React.FC = () => {
                     {verificationCode.map((digit, index) => (
                         <input
                             key={index}
-                            ref={el => codeInputs.current[index] = el}
+                            ref={el => { codeInputs.current[index] = el }}
                             type="text"
                             maxLength={1}
                             value={digit}
